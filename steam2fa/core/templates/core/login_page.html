@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Код входа</title>
+  <style>
+  html,body {
+    height:100%; margin:0;
+    font-family:Arial, sans-serif;
+    background:#081925; color:#fff;
+  }
+  .wrap {
+    min-height:100%;
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .card {
+    width:720px; max-width:95%;
+    border:1px solid rgba(255,255,255,.6);
+    background:rgba(0,0,0,.22);
+  }
+  .header {
+    background:#1f5de3;
+    padding:12px 18px;
+    font-size:28px;
+    font-weight:700;
+    text-align:center;
+  }
+  .body {
+    padding:36px 40px;
+    text-align:center;
+  }
+  .code-box {
+    display:inline-block;
+    background:#1f5de3;
+    color:#fff;
+    border-radius:4px;
+    padding:12px 28px;
+    font-weight:800;
+    font-size:42px;
+    letter-spacing:6px;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .1s ease, background .2s ease;
+  }
+  .code-box:hover { transform:scale(1.05); background:#3577f0; }
+  .note { font-size:18px; margin-top:18px; }
+  .small { font-size:14px; opacity:.85; }
+  #toast {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+    background:#2ecc71; color:#fff; padding:10px 22px; border-radius:8px;
+    opacity:0; transition:opacity .3s ease;
+  }
+  #toast.show { opacity:1; }
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-live="polite">
+      <div class="header">Код для входа в {{ account.login }}:</div>
+      <div class="body">
+        <div id="code" class="code-box" title="Нажмите, чтобы скопировать">{{ code }}</div>
+        <div id="timer" class="note">
+          <span id="timer-text">Осталось: {{ seconds_left }} с</span>
+          <div class="small">Код обновляется каждые 30 секунд</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">Скопировано!</div>
+
+<script>
+(function(){
+  const jsonUrl = "{% url 'login_json_by_login' login=account.login %}";
+  const codeBox = document.getElementById('code');
+  const toast = document.getElementById('toast');
+
+  async function tick(){
+    try{
+      const r = await fetch(jsonUrl);
+      const j = await r.json();
+      if(j.error){
+        codeBox.textContent = 'Ошибка';
+        document.getElementById('timer-text').textContent = j.error;
+        return;
+      }
+      codeBox.textContent = j.code;
+      document.getElementById('timer-text').textContent = 'Осталось: ' + j.seconds_left + ' с';
+    }catch{
+      document.getElementById('timer-text').textContent = 'Ошибка сети';
+    }
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  codeBox.addEventListener('click', async () => {
+    const text = codeBox.textContent.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1000);
+    } catch {
+      alert('Не удалось скопировать');
+    }
+  });
+})();
+</script>
+</body>
+</html>
