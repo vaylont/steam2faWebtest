@@ -1,6 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_http_methods
 from .models import SteamAccount
 
 @require_GET
@@ -53,3 +53,19 @@ def login_json_by_login(request, login):
         })
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+@require_http_methods(["GET", "POST"])
+def index(request):
+    error = None
+    if request.method == "POST":
+        login = request.POST.get("login", "").strip()
+        if not login:
+            error = "Введите логин."
+        else:
+            acc = SteamAccount.objects.filter(login__iexact=login).first()
+            if acc:
+                return redirect("login_page_by_login", login=acc.login)
+            else:
+                error = "Аккаунт не найден."
+
+    return render(request, "core/index.html", {"error": error})

@@ -1,9 +1,11 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -14,9 +16,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["steam2fa.ru", "www.steam2fa.ru","37.140.192.91"]
-
-CSRF_TRUSTED_ORIGINS = ["https://steam2fa.ru", "https://www.steam2fa.ru"]
+ALLOWED_HOSTS = ["localhost","127.0.0.1"]
+#
+# CSRF_TRUSTED_ORIGINS = ["https://steam2fa.ru", "https://www.steam2fa.ru"]
 
 
 # Application definition
@@ -117,3 +119,15 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Dev-режим без HTTPS
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost", "79.174.95.61"]
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://79.174.95.61",
+        "http://79.174.95.61:8000",
+    ]
