@@ -16,9 +16,8 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["79.174.95.61", "steam2fa.ru", "www.steam2fa.ru", "localhost", "127.0.0.1"]
-#
-# CSRF_TRUSTED_ORIGINS = ["https://steam2fa.ru", "https://www.steam2fa.ru"]
+ALLOWED_HOSTS = ["79.174.95.61", "localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["http://79.174.95.61"]
 
 
 # Application definition
